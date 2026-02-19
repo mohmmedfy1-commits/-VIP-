@@ -35,8 +35,10 @@ jobs:
         pip install flet
         pip install -r requirements.txt || true
 
-    - name: Make Xray executable
+    - name: Extract Xray
       run: |
+        mkdir -p assets/xray
+        unzip -o xray.zip -d assets/xray
         chmod +x assets/xray/xray || true
 
     - name: Setup Flutter
@@ -67,3 +69,4 @@ jobs:
       with:
         name: vpn-apk
         path: build/apk
+        if-no-files-found: warn
