@@ -2,8 +2,7 @@ import flet as ft
 import subprocess
 import json
 import os
-from pyzbar.pyzbar import decode
-from PIL import Image
+import cv2
 
 XRAY_PATH = "xray/xray"
 CONFIG_PATH = "xray/config.json"
@@ -32,20 +31,28 @@ def stop_vpn():
         xray_process = None
 
 
+# ✅ استبدال pyzbar بـ OpenCV
 def import_config_from_qr(image_path):
 
-    img = Image.open(image_path)
-    result = decode(img)
+    try:
+        img = cv2.imread(image_path)
 
-    if result:
-        config = result[0].data.decode()
+        if img is None:
+            return False
 
-        with open(CONFIG_PATH, "w") as f:
-            f.write(config)
+        detector = cv2.QRCodeDetector()
+        data, bbox, _ = detector.detectAndDecode(img)
 
-        return True
+        if data:
+            with open(CONFIG_PATH, "w") as f:
+                f.write(data)
 
-    return False
+            return True
+
+        return False
+
+    except:
+        return False
 
 
 def main(page: ft.Page):
